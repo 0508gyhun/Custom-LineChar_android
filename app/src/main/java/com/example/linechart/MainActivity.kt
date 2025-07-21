@@ -1,4 +1,3 @@
-
 package com.example.linechart
 
 import android.graphics.Paint
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        CustomLineChart(data = sampleData, modifier = Modifier.fillMaxSize())
+                        LineChart(data = sampleData, modifier = Modifier.fillMaxSize())
                     }
                 }
             }
@@ -68,7 +67,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CustomLineChart( //커스텀 제외
+fun LineChart( //커스텀 제외
     modifier: Modifier = Modifier,
     data: List<Pair<Int, Double>> = emptyList()
 ) {
@@ -112,7 +111,7 @@ fun CustomLineChart( //커스텀 제외
                 drawText(
                     hour.toString(),
                     spacing + i * spacePerHour,
-                    size.height ,
+                    size.height,
                     textPaint
                 )
             }
@@ -201,6 +200,30 @@ fun CustomLineChart( //커스텀 제외
                 endY = size.height - spacing
             )
         )
+
+        data.indices.forEach { i ->
+            val info = data[i]
+            val ratio = (info.second - lowerValue) / (upperValue - lowerValue)
+            val xPos = spacing + i * spacePerHour
+            val yPos = size.height - spacing - (ratio * (size.height - spacing)).toFloat()
+
+            // 데이터 포인트 원 그리기
+            drawCircle(
+                color = pointColor,
+                center = Offset(xPos, yPos),
+                radius = pointRadius
+            )
+            //데이터 값 텍스트 그리기
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    info.second.roundToInt().toString(), // 값을 정수로 반올림하여 표시
+                    xPos,
+                    yPos - pointRadius - 5.dp.toPx(), // 원 위쪽에 표시
+                    dataValueTextPaint
+                )
+            }
+        }
+
     }
 }
 
